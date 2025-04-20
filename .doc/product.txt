@@ -1,4 +1,4 @@
-a# Product API Contract (GraphQL)
+# Product API Contract (GraphQL)
 
 Endpoint: `/graphql`
 Method: POST

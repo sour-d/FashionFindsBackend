@@ -1,0 +1,214 @@
+## User API Contract (GraphQL)
+
+### Encryption and Decryption
+
+The username and email fields are encrypted using RSA encryption. The public key is used to encrypt the data, and the private key is used to decrypt the data.
+
+**Public Key:**
+
+```
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxmow6645X53ai/0+RmNL
+zc5cZmV1Y0wiS91ZV0Vx85/RRGnS4yIH1z/upLmkThrug0PvdcjG2ytm+hkEHOPG
+RHOthsZqzqExilZLOm3ErEJIVYeHwdugvdpFkm1iNofs1aWHZuEQTH81BF4pR0aj
+lkg3OJHVwQ/9yihxV42H2xBC7S6La2WE0/jawlgeDVjPhgDSaSLipGKIj6M7CyRZ
+fLuTG5Qx1uYSAMZgzq+mkIFlYWtxzYMc4Wy86pC9eS0snlRBq37dVU6rwoUttDmI
+6el18RBSWag0Xkh0TSXtuuSzaUGjIPjbqQKReINkeJAO6w6L7ocGOrz6qEnA6IaG
+jwIDAQAB
+-----END PUBLIC KEY-----
+```
+
+### Types
+
+#### User
+
+Represents a user in the system.
+
+```graphql
+type User {
+  id: ID!
+  username: String!
+  email: String
+}
+```
+
+### Queries
+
+#### `users`
+
+Fetches a list of all users.
+
+**Query:**
+
+```graphql
+query {
+  users {
+    id
+    username
+    email
+  }
+}
+```
+
+**Response:**
+
+Returns an array of `User` objects.
+
+```json
+{
+  "data": {
+    "users": [
+      {
+        "id": "...",
+        "username": "...",
+        "email": "..."
+      },
+      // ... other users
+    ]
+  }
+}
+```
+
+#### `user(id: ID!)`
+
+Fetches a single user by their unique ID.
+
+**Arguments:**
+
+*   `id` (ID!): The unique ID of the user to fetch.
+
+**Query Example (fetching user with ID "default"):**
+
+```graphql
+query {
+  user(id: "default") {
+    id
+    username
+    email
+  }
+}
+```
+
+**Response:**
+
+Returns a single `User` object or `null` if not found.
+
+```json
+{
+  "data": {
+    "user": {
+      "id": "default",
+      "username": "defaultuser",
+      "email": "default@example.com"
+    }
+  }
+}
+```
+
+#### `validateUser(username: String!, password: String!)`
+
+Validates a user's credentials.
+
+**Arguments:**
+
+*   `username` (String!): The username of the user to validate.
+*   `password` (String!): The password of the user to validate.
+
+**Query:**
+
+```graphql
+query ValidateUser($username: String!, $password: String!) {
+  validateUser(username: $username, password: $password)
+}
+```
+
+**Response:**
+
+Returns a JWT token if the user is valid, otherwise returns null. The JWT token is dynamically generated for each user and session. The following is an example of a JWT token:
+
+```json
+{
+  "data": {
+    "validateUser": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MmI0MzQ2OC1iNjQ2LTQ4MzEtYjQ4My0zNmE0NjQzNjQ2NDYiLCJpYXQiOjE2NzQ4ODU0ODMsImV4cCI6MTY3NDg4OTA4M30.W-EqULzpdvmo9szw8Jmx0j-EKw0U-RSnM9896gcwJQw"
+  }
+}
+```
+
+On successful validation, the server returns a JWT token that can be used to authenticate subsequent requests. If the user is invalid, the server returns null. The actual JWT token will vary depending on the user and session.
+
+#### `me`
+
+Fetches the currently logged-in user's information. This query requires a valid JWT token in the `Authorization` header.
+
+**Headers:**
+
+```
+Authorization: Bearer <JWT token>
+```
+
+**Query:**
+
+```graphql
+query {
+  me {
+    id
+    username
+    email
+  }
+}
+```
+
+**Response:**
+
+Returns the `User` object for the currently logged-in user.
+
+```json
+{
+  "data": {
+    "me": {
+      "id": "...",
+      "username": "...",
+      "email": "..."
+    }
+  }
+}
+```
+
+### Mutations
+
+#### `createUser(username: String!, password: String!, email: String)`
+
+Creates a new user.
+
+**Arguments:**
+
+*   `username` (String!): The username for the new user.
+*   `password` (String!): The password for the new user.
+*   `email` (String): The email address for the new user.
+
+**Mutation:**
+
+```graphql
+mutation {
+  createUser(username: "newuser", password: "newpassword", email: "new@example.com") {
+    id
+    username
+    email
+  }
+}
+```
+
+**Response:**
+
+Returns the newly created `User` object.
+
+```json
+{
+  "data": {
+    "createUser": {
+      "id": "...",
+      "username": "newuser",
+      "email": "new@example.com"
+    }
+  }
+}
