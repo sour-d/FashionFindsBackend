@@ -1,0 +1,100 @@
+a# Product API Contract (GraphQL)
+
+Endpoint: `/graphql`
+Method: POST
+
+## Types
+
+### Product
+
+Represents a product available in the store.
+
+```graphql
+type Product {
+  id: ID!          # Unique identifier for the product
+  name: String!    # Name of the product
+  description: String # Description of the product
+  price: Float!    # Price of the product
+  stock: Int!      # Number of items currently in stock
+}
+```
+
+## Queries
+
+### `products`
+
+Fetches a list of all available products.
+
+**Query:**
+
+```graphql
+query {
+  products {
+    id
+    name
+    description
+    price
+    stock
+  }
+}
+```
+
+**Response:**
+
+Returns an array of `Product` objects.
+
+```json
+{
+  "data": {
+    "products": [
+      {
+        "id": "1",
+        "name": "Stylish T-Shirt",
+        "description": "A comfortable and stylish t-shirt.",
+        "price": 25.99,
+        "stock": 150
+      },
+      // ... other products
+    ]
+  }
+}
+```
+
+### `product(id: ID!)`
+
+Fetches a single product by its unique ID.
+
+**Arguments:**
+
+*   `id` (ID!): The unique ID of the product to fetch.
+
+**Query Example (fetching product with ID "2"):**
+
+```graphql
+query {
+  product(id: "2") {
+    id
+    name
+    description
+    price
+    stock
+  }
+}
+```
+
+**Response:**
+
+Returns a single `Product` object or `null` if not found.
+
+```json
+{
+  "data": {
+    "product": {
+      "id": "2",
+      "name": "Classic Jeans",
+      "description": "Durable denim jeans.",
+      "price": 49.99,
+      "stock": 85
+    }
+  }
+}
