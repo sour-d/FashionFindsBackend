@@ -1,8 +1,10 @@
 ## User API Contract (GraphQL)
 
+All requests to the User API should be made to the `/graphql` endpoint.
+
 ### Encryption and Decryption
 
-The username and email fields are encrypted using RSA encryption. The public key is used to encrypt the data, and the private key is used to decrypt the data.
+The username and email fields are encrypted using RSA encryption. The public key is used to encrypt the data, and the private key is used to decrypt the data. The username is truncated to a maximum of 20 characters before encryption to prevent the "data too large for key size" error.
 
 **Public Key:**
 

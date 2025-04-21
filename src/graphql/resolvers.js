@@ -75,35 +75,23 @@ const resolvers = {
     },
 
     validateUser: async (parent, { username, password }) => {
-      console.log("validateUser: username", username);
-      console.log("validateUser: password", password);
       try {
-        const encryptedUsername = encrypt(username); // Frontend sends plain, you encrypt it
-        console.log("validateUser: encryptedUsername", encryptedUsername);
-
         const { rows } = await pool.query(
           'SELECT * FROM users WHERE username = $1',
-          [encryptedUsername]
+          [username]
         );
-        console.log('validateUser: Rows:', rows);
 
         if (rows.length === 0) {
-          console.log("validateUser: User not found");
           return null;
         }
 
         const user = rows[0];
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log("validateUser: isPasswordValid", isPasswordValid);
 
         if (!isPasswordValid) {
-          console.log("validateUser: Invalid password");
           return null;
         }
-
-        // Generate JWT token
         const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
-        console.log("validateUser: token", token);
         return token;
       } catch (error) {
         console.error('Error validating user:', error);
@@ -111,8 +99,7 @@ const resolvers = {
       }
     },
     me: async (parent, args, context) => {
-      // Check if user is authenticated
-      const token = context.headers.authorization?.split(' ')[1];
+      const token = context.headers?.authorization?.split(' ')[1];
       if (!token) {
         throw new Error('Authentication required');
       }
@@ -129,7 +116,7 @@ const resolvers = {
         const user = rows[0];
         return {
           ...user,
-          username: maybeEncryptOutput(decrypt(user.username)),
+          username: user.username,
           email: maybeEncryptOutput(decrypt(user.email)),
         };
       } catch (error) {

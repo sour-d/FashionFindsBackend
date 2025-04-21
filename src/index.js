@@ -16,9 +16,10 @@ async function startServer() {
     console.error("Migration failed:", error);
   }
 
-  const server = new ApolloServer({
+ const server = new ApolloServer({
     typeDefs: [productSchema, userSchema],
     resolvers,
+    context: ({ req }) => ({ headers: req.headers }),
   });
 
   await server.start(); // Start the Apollo Server

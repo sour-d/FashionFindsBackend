@@ -60,7 +60,7 @@ async function migrate() {
     `);
 
     // Encrypt sensitive fields
-    const encryptedUsername = encrypt('user');
+    const encryptedUsername = 'user';
     const encryptedEmail = encrypt('default@example.com');
     const hashedPassword = await bcrypt.hash('pw', 10);
 
